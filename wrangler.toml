@@ -1,0 +1,10 @@
+name = "openwallet-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+OPENWALLET_API_URL = "https://api.openwallet.vn"
+
+# Secrets — set via: wrangler secret put MCP_API_KEY
+#                    wrangler secret put OPENWALLET_API_KEY
