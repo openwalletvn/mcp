@@ -1,0 +1,27 @@
+name: Deploy Inspector
+
+on:
+  push:
+    branches: [main]
+    paths: ['inspector/**']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build inspector UI
+        working-directory: inspector
+        run: npm install && npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          command: pages deploy public --project-name=openwallet-inspector
+          workingDirectory: inspector

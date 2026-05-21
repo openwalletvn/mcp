@@ -1,0 +1,11 @@
+{
+  "name": "openwallet-inspector",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "0.21.2"
+  }
+}
