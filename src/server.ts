@@ -1,7 +1,6 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Env} from './lib/api.js';
-// @ts-ignore
-import pkg from '../../package.json';
+import pkg from '../package.json';
 import {registerListBanks} from './tools/list-banks.js';
 import {registerResolveBank} from './tools/resolve-bank.js';
 import {registerListIntents} from './tools/list-intents.js';
