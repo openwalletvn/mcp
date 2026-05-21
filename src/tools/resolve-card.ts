@@ -2,12 +2,21 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { apiFetch, type Env } from '../lib/api.js';
 
+type CardSlim = { id: string; name: string; bank_id: string };
+const MAX_CANDIDATES = 5;
+
 export async function executeResolveCard(env: Env, query: string) {
-    const res = await apiFetch(env, `/api/v1/cards?q=${encodeURIComponent(query)}&limit=1`);
-    const json = await res.json() as { success: boolean; data: { id: string; name: string; bank_id: string }[] };
+    const res = await apiFetch(env, `/api/v1/cards?q=${encodeURIComponent(query)}`);
+    const json = await res.json() as { success: boolean; data: CardSlim[]; meta: { filtered: number } };
     if (!json.success) throw new Error('Failed to resolve card');
-    const first = json.data[0];
-    return first ? { id: first.id, name: first.name, bank_id: first.bank_id } : null;
+    const { data } = json;
+    if (data.length === 0) return null;
+    if (data.length === 1) return { id: data[0].id, name: data[0].name, bank_id: data[0].bank_id, confidence: 'exact' as const };
+    return {
+        confidence: 'ambiguous' as const,
+        message: `"${query}" matched ${data.length} cards. Ask the user which card they mean.`,
+        matches: data.slice(0, MAX_CANDIDATES).map(c => ({ id: c.id, name: c.name, bank_id: c.bank_id })),
+    };
 }
 
 export function registerResolveCard(server: McpServer, env: Env) {
@@ -15,7 +24,7 @@ export function registerResolveCard(server: McpServer, env: Env) {
         'resolveCard',
         {
             title: 'Resolve Card',
-            description: 'Look up a card ID from a name or description (e.g. "techcombank black", "shopee vpbank"). Returns { id, name, bank_id }, or null if not found.',
+            description: 'Look up a card ID from a name or description (e.g. "techcombank black", "shopee vpbank"). Returns { id, name, bank_id, confidence: "exact" } when unambiguous, or { confidence: "ambiguous", matches, message } when multiple cards match — in that case, present the matches to the user and ask them to clarify.',
             inputSchema: z.object({
                 query: z.string().describe('Card name or description to search for'),
             }),
