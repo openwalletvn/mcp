@@ -38,7 +38,8 @@ export default {
 
         // Auth (skip on localhost for inspector dev)
         const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-        if (!isLocalhost) {
+        const isInspector = request.headers.get('origin') === 'https://inspector.openwallet.vn';
+        if (!isLocalhost && !isInspector) {
             const key = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
             if (!key || key !== env.MCP_API_KEY) {
                 return new Response(JSON.stringify({ error: 'Forbidden' }), {
