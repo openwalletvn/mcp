@@ -21,6 +21,11 @@ const preloadScript = `<script>
     localStorage.setItem('lastConnectionType', 'direct');
     localStorage.setItem('_owInit', '2');
   }
+  if (!localStorage.getItem('lastCustomHeaders')) {
+    localStorage.setItem('lastCustomHeaders', JSON.stringify([
+      { name: 'x-mcp-key', value: '', enabled: true }
+    ]));
+  }
 </script>`;
 writeFileSync(indexPath, html.replace('</head>', preloadScript + '\n</head>'));
 console.log('Inspector UI built with pre-configured defaults.');
