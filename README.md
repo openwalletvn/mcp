@@ -12,6 +12,21 @@ X-MCP-Key: your-api-key
 
 Contact OpenWallet to get an API key.
 
+## Inspector
+
+To explore and test tools interactively, use the hosted MCP Inspector:
+
+**https://inspector.openwallet.vn**
+
+1. Open the URL
+2. Go to **Configuration** tab
+3. Add header — `x-mcp-key`: `<your-api-key>`
+4. Click **Connect**
+
+Transport and server URL are pre-configured. See [`inspector/`](./inspector/README.md) for deployment details.
+
+Read more about [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector)
+
 ## Tools
 
 ### `listBanks`
