@@ -54,9 +54,9 @@ pnpm install
 # 2. Set secrets in .dev.vars
 cp .dev.vars.example .dev.vars
 # Fill in MCP_API_KEY, OPENWALLET_API_KEY
-# Set OPENWALLET_API_URL=http://localhost:3002 for local API
+# Set OPENWALLET_API_URL=http://localhost:8787 for local API
 
-# 3. Start API repo (port 3002) in another terminal
+# 3. Start API repo (port 8787) in another terminal — `pnpm dev` in api repo
 
 # 4. Run MCP locally
 pnpm dev   # → http://localhost:8787
