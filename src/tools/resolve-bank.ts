@@ -2,11 +2,20 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { apiFetch, type Env } from '../lib/api.js';
 
+const MAX_CANDIDATES = 5;
+
 export async function executeResolveBank(env: Env, query: string) {
     const res = await apiFetch(env, `/api/v1/banks?q=${encodeURIComponent(query)}`);
     const json = await res.json() as { success: boolean; data: Record<string, unknown>[] };
     if (!json.success) throw new Error('Failed to resolve bank');
-    return json.data[0] ?? null;
+    const { data } = json;
+    if (data.length === 0) return null;
+    if (data.length === 1) return { ...data[0], confidence: 'exact' as const };
+    return {
+        confidence: 'ambiguous' as const,
+        message: `"${query}" matched ${data.length} banks. Ask the user which bank they mean.`,
+        matches: data.slice(0, MAX_CANDIDATES),
+    };
 }
 
 export function registerResolveBank(server: McpServer, env: Env) {
@@ -14,7 +23,7 @@ export function registerResolveBank(server: McpServer, env: Env) {
         'resolveBank',
         {
             title: 'Resolve Bank',
-            description: 'Find a bank by name or alias (e.g. "vcb", "vietcombank", "a chau"). Returns the bank object, or null if not found. Use listBanks to browse all options.',
+            description: 'Find a bank by name or alias (e.g. "vcb", "vietcombank", "a chau"). Returns the bank object with confidence: "exact" when unambiguous, or { confidence: "ambiguous", matches, message } when multiple banks match — in that case, present the matches to the user and ask them to clarify. Returns null if not found. Use listBanks to browse all options.',
             inputSchema: z.object({
                 query: z.string().describe('Bank name or alias to search for'),
             }),
