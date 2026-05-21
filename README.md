@@ -19,9 +19,7 @@ To explore and test tools interactively, use the hosted MCP Inspector:
 **https://inspector.openwallet.vn**
 
 1. Open the URL
-2. Go to **Configuration** tab
-3. Add header — `x-mcp-key`: `<your-api-key>`
-4. Click **Connect**
+2. Click **Connect**
 
 Transport and server URL are pre-configured. See [`inspector/`](./inspector/README.md) for deployment details.
 
