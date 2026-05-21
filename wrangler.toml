@@ -15,3 +15,7 @@ new_sqlite_classes = ["OpenWalletMCP"]
 
 [durable_objects]
 bindings = [{ class_name = "OpenWalletMCP", name = "MCP_OBJECT" }]
+
+[observability.logs]
+enabled = true
+invocation_logs = true
