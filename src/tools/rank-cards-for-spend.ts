@@ -14,7 +14,7 @@ export async function executeRankCardsForSpend(env: Env, input: RankCardsInput) 
         body: JSON.stringify(input),
     });
     const json = await res.json() as { success: boolean; data: unknown; error?: string };
-    if (!json.success) throw new Error(json.error ?? 'Không thể xếp hạng thẻ');
+    if (!json.success) throw new Error(json.error ?? 'Failed to rank cards');
     return json.data;
 }
 
@@ -22,18 +22,24 @@ export function registerRankCardsForSpend(server: McpServer, env: Env) {
     server.registerTool(
         'rankCardsForSpend',
         {
-            description: 'CÔNG CỤ CHÍNH để tư vấn thẻ tốt nhất cho chi tiêu. Dùng khi người dùng hỏi "thẻ nào hoàn tiền tốt", "thẻ nào tốt nhất cho chi tiêu X". Xếp hạng tất cả thẻ theo hồ sơ chi tiêu thực tế. spend phải có ít nhất một key với giá trị > 0.',
+            title: 'Rank Cards for Spend',
+            description: 'Rank all cards by estimated cashback for a given monthly spend profile. Returns up to limit cards sorted by total benefit, with per-intent and total cashback breakdown. spend must have at least one key with a value > 0. Use listIntents to discover valid spend category slugs.',
             inputSchema: z.object({
                 spend: z.record(z.string(), z.number()).describe(
-                    'Hồ sơ chi tiêu: key là intent slug, value là VND/tháng. Ví dụ: {"ecommerce":5000000,"dining":2000000}'
+                    'Monthly spend profile: keys are intent slugs, values are VND/month. Example: {"ecommerce":5000000,"dining":2000000}'
                 ),
-                limit: z.number().int().min(1).max(10).default(3),
-                type: z.enum(['credit', 'debit']).optional(),
+                limit: z.number().int().min(1).max(10).default(3).describe('Max cards to return'),
+                type: z.enum(['credit', 'debit']).optional().describe('Filter by card type'),
             }),
+            annotations: { readOnlyHint: true, destructiveHint: false },
         },
         async (input) => {
-            const data = await executeRankCardsForSpend(env, input);
-            return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            try {
+                const data = await executeRankCardsForSpend(env, input);
+                return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            } catch (err) {
+                return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
+            }
         }
     );
 }

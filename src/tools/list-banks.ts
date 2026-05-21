@@ -5,7 +5,7 @@ import { apiFetch, type Env } from '../lib/api.js';
 export async function executeListBanks(env: Env) {
     const res = await apiFetch(env, '/api/v1/banks');
     const json = await res.json() as { success: boolean; data: Record<string, unknown>[] };
-    if (!json.success) throw new Error('Không thể lấy danh sách ngân hàng');
+    if (!json.success) throw new Error('Failed to fetch bank list');
     return json.data.map(({ id, name, full_name, link, networks }) => ({ id, name, full_name, link, networks }));
 }
 
@@ -13,12 +13,18 @@ export function registerListBanks(server: McpServer, env: Env) {
     server.registerTool(
         'listBanks',
         {
-            description: 'Liệt kê tất cả ngân hàng phát hành thẻ tại Việt Nam.',
+            title: 'List Banks',
+            description: 'List all card-issuing banks in Vietnam. Returns id, name, full_name, link, and supported networks for each bank.',
             inputSchema: z.object({}),
+            annotations: { readOnlyHint: true, destructiveHint: false },
         },
         async () => {
-            const data = await executeListBanks(env);
-            return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            try {
+                const data = await executeListBanks(env);
+                return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            } catch (err) {
+                return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
+            }
         }
     );
 }

@@ -1,36 +1,57 @@
-import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { McpAgent } from 'agents/mcp';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createMcpServer } from './server.js';
 import type { Env } from './lib/api.js';
 
+export class OpenWalletMCP extends McpAgent<Env> {
+    server = new McpServer(
+        { name: 'openwallet-mcp', version: '0.1.0' },
+        { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
+    );
+
+    async init() {
+        createMcpServer(this.env, this.server);
+    }
+}
+
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': '*',
+};
+
 export default {
-    async fetch(request: Request, env: Env): Promise<Response> {
-        // Auth
-        const key = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
-        if (!key || key !== env.MCP_API_KEY) {
-            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' },
-            });
+    async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+        // CORS preflight
+        if (request.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: CORS_HEADERS });
         }
+
+        const url = new URL(request.url);
 
         // Health check
-        if (request.method === 'GET' && new URL(request.url).pathname === '/') {
-            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '0.1.0', tools: 8 }), {
-                headers: { 'Content-Type': 'application/json' },
+        if (url.pathname === '/health') {
+            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '0.1.0' }), {
+                headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }
 
-        // MCP — stateless: new server + transport per request
-        const server = createMcpServer(env);
-        const transport = new WebStandardStreamableHTTPServerTransport({
-            sessionIdGenerator: undefined, // stateless
-        });
-        await server.connect(transport);
-
-        try {
-            return await transport.handleRequest(request);
-        } finally {
-            await server.close();
+        // Auth (skip on localhost for inspector dev)
+        const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+        if (!isLocalhost) {
+            const key = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
+            if (!key || key !== env.MCP_API_KEY) {
+                return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                    status: 401,
+                    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+                });
+            }
         }
+
+        // MCP via McpAgent (handles sessions + SSE)
+        const response = await OpenWalletMCP.serve('/').fetch(request, env, ctx);
+        const headers = new Headers(response.headers);
+        for (const [k, v] of Object.entries(CORS_HEADERS)) headers.set(k, v);
+        return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
     },
 } satisfies ExportedHandler<Env>;

@@ -9,11 +9,13 @@ import { registerResolveCard } from './tools/resolve-card.js';
 import { registerRankCardsForSpend } from './tools/rank-cards-for-spend.js';
 import { registerCompareCards } from './tools/compare-cards.js';
 
-export function createMcpServer(env: Env): McpServer {
-    const server = new McpServer({
-        name: 'openwallet-mcp',
-        version: '0.1.0',
-    });
+export function createMcpServer(env: Env, server?: McpServer): McpServer {
+    if (!server) {
+        server = new McpServer(
+            { name: 'openwallet-mcp', version: '0.1.0' },
+            { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
+        );
+    }
 
     registerListBanks(server, env);
     registerResolveBank(server, env);

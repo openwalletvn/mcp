@@ -5,7 +5,7 @@ import { apiFetch, type Env } from '../lib/api.js';
 export async function executeResolveBank(env: Env, query: string) {
     const res = await apiFetch(env, `/api/v1/banks?q=${encodeURIComponent(query)}`);
     const json = await res.json() as { success: boolean; data: Record<string, unknown>[] };
-    if (!json.success) throw new Error('Không thể tìm ngân hàng');
+    if (!json.success) throw new Error('Failed to resolve bank');
     return json.data[0] ?? null;
 }
 
@@ -13,14 +13,20 @@ export function registerResolveBank(server: McpServer, env: Env) {
     server.registerTool(
         'resolveBank',
         {
-            description: 'Tìm ngân hàng từ tên hoặc tên viết tắt. Hỗ trợ: "vcb", "a chau", "ngân hàng ngoại thương", v.v. Trả về null nếu không tìm thấy.',
+            title: 'Resolve Bank',
+            description: 'Find a bank by name or alias (e.g. "vcb", "vietcombank", "a chau"). Returns the bank object, or null if not found. Use listBanks to browse all options.',
             inputSchema: z.object({
-                query: z.string().describe('Tên hoặc viết tắt ngân hàng'),
+                query: z.string().describe('Bank name or alias to search for'),
             }),
+            annotations: { readOnlyHint: true, destructiveHint: false },
         },
         async ({ query }) => {
-            const data = await executeResolveBank(env, query);
-            return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            try {
+                const data = await executeResolveBank(env, query);
+                return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
+            } catch (err) {
+                return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };
+            }
         }
     );
 }
