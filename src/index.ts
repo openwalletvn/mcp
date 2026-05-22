@@ -78,10 +78,9 @@ export default {
                 });
             }
 
-            // Track usage per key label
-            const toolName = url.pathname.replace(/^\//, '') || 'unknown';
+            console.log(JSON.stringify({ key: result.label!, path: url.pathname }));
             env.ANALYTICS?.writeDataPoint({
-                blobs: [result.label!, toolName],
+                blobs: [result.label!, url.pathname],
                 indexes: [result.label!],
             });
         }
