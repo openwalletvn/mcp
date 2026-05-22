@@ -1,7 +1,12 @@
+export interface AnalyticsEngineDataset {
+    writeDataPoint(event: { blobs?: string[]; doubles?: number[]; indexes?: string[] }): void;
+}
+
 export interface Env {
-    MCP_API_KEY: string;
+    MCP_KEYS: string;
     OPENWALLET_API_KEY: string;
     OPENWALLET_API_URL: string;
+    ANALYTICS: AnalyticsEngineDataset;
 }
 
 export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {

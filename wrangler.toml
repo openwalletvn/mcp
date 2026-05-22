@@ -6,8 +6,12 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 OPENWALLET_API_URL = "https://api.openwallet.vn"
 
-# Secrets — set via: wrangler secret put MCP_API_KEY
+# Secrets — set via: wrangler secret put MCP_KEYS        (JSON array of key objects)
 #                    wrangler secret put OPENWALLET_API_KEY
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "mcp_usage"
 
 [[migrations]]
 tag = "v1"

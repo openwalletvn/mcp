@@ -2,6 +2,7 @@ import { McpAgent } from 'agents/mcp';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createMcpServer } from './server.js';
 import type { Env } from './lib/api.js';
+import { validateKey } from './auth.js';
 
 export class OpenWalletMCP extends McpAgent<Env> {
     server = new McpServer(
@@ -29,24 +30,32 @@ export default {
 
         const url = new URL(request.url);
 
-        // Health check
+        // Health check — no auth required
         if (url.pathname === '/health') {
             return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '0.1.0' }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }
 
-        // Auth (skip on localhost for inspector dev)
+        // Auth — skip on localhost for local dev
         const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-        const isInspector = request.headers.get('origin') === 'https://inspector.openwallet.vn';
-        if (!isLocalhost && !isInspector) {
-            const key = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
-            if (!key || key !== env.MCP_API_KEY) {
-                return new Response(JSON.stringify({ error: 'Forbidden' }), {
-                    status: 403,
+        const rawKey = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
+
+        if (!isLocalhost) {
+            const result = validateKey(rawKey, env.MCP_KEYS ?? '[]');
+            if (!result.valid) {
+                return new Response(JSON.stringify({ error: 'Invalid or missing API key' }), {
+                    status: 401,
                     headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
                 });
             }
+
+            // Track usage per key label
+            const toolName = url.pathname.replace(/^\//, '') || 'unknown';
+            env.ANALYTICS?.writeDataPoint({
+                blobs: [result.label!, toolName],
+                indexes: [result.label!],
+            });
         }
 
         // MCP via McpAgent (handles sessions + SSE)
