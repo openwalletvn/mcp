@@ -15,6 +15,8 @@ export class OpenWalletMCP extends McpAgent<Env> {
     }
 }
 
+const ALLOWED_PATHS = new Set(['/', '/health', '/sse', '/message']);
+
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -29,6 +31,10 @@ export default {
         }
 
         const url = new URL(request.url);
+        // Allowlist check – block unknown paths before auth
+        if (!ALLOWED_PATHS.has(url.pathname)) {
+            return new Response(null, { status: 404 });
+        }
 
         // Health check — no auth required
         if (url.pathname === '/health') {
