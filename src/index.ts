@@ -67,6 +67,7 @@ export default {
         const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
         const origin = request.headers.get('origin') ?? '';
         const isInspector = origin === 'https://inspector.openwallet.vn';
+        console.log(JSON.stringify({ debug: true, path: url.pathname, origin, isLocalhost, isInspector }));
         const rawKey = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
 
         if (!isLocalhost && !isInspector) {

@@ -21,7 +21,7 @@ new_sqlite_classes = ["OpenWalletMCP"]
 bindings = [{ class_name = "OpenWalletMCP", name = "MCP_OBJECT" }]
 
 [observability]
-enabled = false
+enabled = true
 head_sampling_rate = 1
 
 [observability.logs]
