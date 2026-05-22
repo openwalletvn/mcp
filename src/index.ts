@@ -15,7 +15,7 @@ export class OpenWalletMCP extends McpAgent<Env> {
     }
 }
 
-const ALLOWED_PATHS = new Set(['/', '/health', '/sse', '/message']);
+const ALLOWED_PATHS = new Set(['/', '/health', '/sse', '/message', '/badge']);
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -41,6 +41,25 @@ export default {
             return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '0.1.0' }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
+        }
+
+        // Badge — no auth, for shields.io endpoint badge
+        if (url.pathname === '/badge') {
+            return new Response(
+                JSON.stringify({
+                    schemaVersion: 1,
+                    label: 'mcp',
+                    message: 'online',
+                    color: 'brightgreen',
+                }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'public, max-age=60, s-maxage=60',
+                        ...CORS_HEADERS,
+                    },
+                }
+            );
         }
 
         // Auth — skip on localhost or inspector origin

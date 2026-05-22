@@ -1,5 +1,7 @@
 # OpenWallet MCP Server
 
+[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge)](https://mcp.openwallet.vn/health)
+
 MCP server providing Vietnamese bank card data tools. Hosted at `mcp.openwallet.vn`.
 
 ## Authentication
@@ -57,6 +59,22 @@ Returns ranked list with estimated monthly cashback.
 
 ### `compareCards(card_ids)`
 Compare 2–4 cards side-by-side by ID.
+
+## Badge
+
+Embed live MCP status in any site:
+
+**Markdown:**
+```md
+[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge)](https://mcp.openwallet.vn/health)
+```
+
+**HTML:**
+```html
+<a href="https://mcp.openwallet.vn/health">
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge" alt="MCP Status">
+</a>
+```
 
 ## Local Development
 
