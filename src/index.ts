@@ -43,11 +43,13 @@ export default {
             });
         }
 
-        // Auth — skip on localhost for local dev
+        // Auth — skip on localhost or inspector origin
         const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+        const origin = request.headers.get('origin') ?? '';
+        const isInspector = origin === 'https://inspector.openwallet.vn';
         const rawKey = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
 
-        if (!isLocalhost) {
+        if (!isLocalhost && !isInspector) {
             const result = validateKey(rawKey, env.MCP_KEYS ?? '[]');
             if (!result.valid) {
                 return new Response(JSON.stringify({ error: 'Invalid or missing API key' }), {
