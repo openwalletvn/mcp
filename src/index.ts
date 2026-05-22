@@ -48,7 +48,7 @@ export default {
             return new Response(
                 JSON.stringify({
                     schemaVersion: 1,
-                    label: 'mcp',
+                    label: 'MCP v0.1.0',
                     message: 'online',
                     color: 'brightgreen',
                     cacheSeconds: 60,
