@@ -1,0 +1,25 @@
+# =============================================================================
+# OpenWallet MCP — Local Dev Variables
+# Copy this file to .dev.vars and fill in values.
+# Never commit .dev.vars — it holds real secrets.
+# Production secrets are set via: wrangler secret put <KEY>
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# MCP API Keys
+# JSON array of allowed keys. Each entry: { key, expires, label }
+# - key: string identifier sent by consumers as x-mcp-key header
+# - expires: ISO date string (YYYY-MM-DD)
+# - label: used in analytics to identify the consumer
+# Generate a key: openssl rand -hex 8 → prefix with owmcp_
+# Production: wrangler secret put MCP_KEYS
+# -----------------------------------------------------------------------------
+MCP_KEYS=[{"key":"owmcp_dev","expires":"2099-12-31","label":"dev"}]
+
+# -----------------------------------------------------------------------------
+# OpenWallet API  (api.openwallet.vn)
+# Key: check Cloudflare dashboard → Workers → openwallet-api → Secrets
+# Production: wrangler secret put OPENWALLET_API_KEY
+# -----------------------------------------------------------------------------
+OPENWALLET_API_KEY=your-api-key-here
+OPENWALLET_API_URL=http://localhost:8788
