@@ -1,6 +1,6 @@
 # OpenWallet MCP Server
 
-[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge)](https://mcp.openwallet.vn/health)
+[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge&cacheSeconds=60)](https://mcp.openwallet.vn/health)
 
 MCP server providing Vietnamese bank card data tools. Hosted at `mcp.openwallet.vn`.
 
@@ -66,13 +66,13 @@ Embed live MCP status in any site:
 
 **Markdown:**
 ```md
-[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge)](https://mcp.openwallet.vn/health)
+[![MCP Status](https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge&cacheSeconds=60)](https://mcp.openwallet.vn/health)
 ```
 
 **HTML:**
 ```html
 <a href="https://mcp.openwallet.vn/health">
-  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge" alt="MCP Status">
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fmcp.openwallet.vn%2Fbadge&cacheSeconds=60" alt="MCP Status">
 </a>
 ```
 

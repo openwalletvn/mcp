@@ -51,6 +51,7 @@ export default {
                     label: 'mcp',
                     message: 'online',
                     color: 'brightgreen',
+                    cacheSeconds: 60,
                 }),
                 {
                     headers: {
