@@ -15,11 +15,11 @@ cpSync(src, dest, { recursive: true });
 const indexPath = resolve(dest, 'index.html');
 const html = readFileSync(indexPath, 'utf8');
 const preloadScript = `<script>
-  if (localStorage.getItem('_owInit') !== '2') {
-    localStorage.setItem('lastSseUrl', 'https://mcp.openwallet.vn/');
+  if (localStorage.getItem('_owInit') !== '3') {
+    localStorage.setItem('lastSseUrl', 'https://inspector.openwallet.vn/proxy/');
     localStorage.setItem('lastTransportType', 'streamable-http');
     localStorage.setItem('lastConnectionType', 'direct');
-    localStorage.setItem('_owInit', '2');
+    localStorage.setItem('_owInit', '3');
   }
 </script>`;
 writeFileSync(indexPath, html.replace('</head>', preloadScript + '\n</head>'));

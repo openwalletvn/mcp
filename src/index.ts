@@ -6,7 +6,7 @@ import { validateKey } from './auth.js';
 
 export class OpenWalletMCP extends McpAgent<Env> {
     server = new McpServer(
-        { name: 'openwallet-mcp', version: '0.1.0' },
+        { name: 'openwallet-mcp', version: '1.0.0' },
         { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
     );
 
@@ -38,7 +38,7 @@ export default {
 
         // Health check — no auth required
         if (url.pathname === '/health') {
-            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '0.1.0' }), {
+            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.0' }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }
@@ -48,7 +48,7 @@ export default {
             return new Response(
                 JSON.stringify({
                     schemaVersion: 1,
-                    label: 'MCP v0.1.0',
+                    label: 'MCP v1.0.0',
                     message: 'online',
                     color: 'brightgreen',
                     cacheSeconds: 60,
@@ -63,14 +63,11 @@ export default {
             );
         }
 
-        // Auth — skip on localhost or inspector origin
+        // Auth — skip on localhost (wrangler dev only)
         const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-        const origin = request.headers.get('origin') ?? '';
-        const isInspector = origin === 'https://inspector.openwallet.vn';
-        console.log(JSON.stringify({ debug: true, path: url.pathname, origin, isLocalhost, isInspector }));
         const rawKey = request.headers.get('x-mcp-key') ?? request.headers.get('authorization')?.replace('Bearer ', '');
 
-        if (!isLocalhost && !isInspector) {
+        if (!isLocalhost) {
             const result = validateKey(rawKey, env.MCP_KEYS ?? '[]');
             if (!result.valid) {
                 return new Response(JSON.stringify({ error: 'Invalid or missing API key' }), {
