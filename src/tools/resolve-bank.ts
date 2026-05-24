@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { apiFetch, type Env } from '../lib/api.js';
+import { apiFetch, stripBank, type Env } from '../lib/api.js';
 
 const MAX_CANDIDATES = 5;
 
@@ -10,11 +10,11 @@ export async function executeResolveBank(env: Env, query: string) {
     if (!json.success) throw new Error('Failed to resolve bank');
     const { data } = json;
     if (data.length === 0) return null;
-    if (data.length === 1) return { ...data[0], confidence: 'exact' as const };
+    if (data.length === 1) return { ...stripBank(data[0]), confidence: 'exact' as const };
     return {
         confidence: 'ambiguous' as const,
         message: `"${query}" matched ${data.length} banks. Ask the user which bank they mean.`,
-        matches: data.slice(0, MAX_CANDIDATES),
+        matches: data.slice(0, MAX_CANDIDATES).map(stripBank),
     };
 }
 
