@@ -7,6 +7,11 @@ export interface Env {
     OPENWALLET_API_KEY: string;
     OPENWALLET_API_URL: string;
     ANALYTICS: AnalyticsEngineDataset;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    MCP_OBJECT: any;
+    LANGFUSE_PUBLIC_KEY: string;
+    LANGFUSE_SECRET_KEY: string;
+    LANGFUSE_BASE_URL: string;
 }
 
 export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {

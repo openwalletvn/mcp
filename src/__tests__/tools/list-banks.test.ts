@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { executeListBanks } from '../../tools/list-banks.ts';
 
-const mockEnv = { MCP_API_KEY: 'k', OPENWALLET_API_KEY: 'k', OPENWALLET_API_URL: 'http://api.test' };
+const mockEnv = { MCP_API_KEY: 'k', OPENWALLET_API_KEY: 'k', OPENWALLET_API_URL: 'http://api.test' } as unknown as import('../../lib/api.ts').Env;
 
 const MOCK_BANKS = [
     { id: 'vietcombank', name: 'Vietcombank', full_name: 'Ngân hàng Ngoại thương', link: 'https://vcb.vn', networks: ['visa'] },

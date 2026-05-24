@@ -1,5 +1,6 @@
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {Env} from './lib/api.js';
+import {sendTrace} from './lib/langfuse.js';
 import pkg from '../package.json';
 import {registerListBanks} from './tools/list-banks.js';
 import {registerResolveBank} from './tools/resolve-bank.js';
@@ -17,6 +18,36 @@ export function createMcpServer(env: Env, server?: McpServer): McpServer {
             { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
         );
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const originalRegisterTool = (server.registerTool as any).bind(server);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (server as any).registerTool = (name: string, schema: any, handler: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return originalRegisterTool(name, schema, async (...args: any[]) => {
+            const input = args[0];
+            const start = Date.now();
+            try {
+                const result = await handler(...args);
+                await sendTrace(env, {
+                    name: `mcp:${name}`,
+                    input,
+                    output: result,
+                    metadata: { latencyMs: Date.now() - start },
+                });
+                return result;
+            } catch (err) {
+                await sendTrace(env, {
+                    name: `mcp:${name}`,
+                    input,
+                    level: 'ERROR',
+                    statusMessage: String(err),
+                    metadata: { latencyMs: Date.now() - start },
+                });
+                throw err;
+            }
+        });
+    };
 
     registerListBanks(server, env);
     registerResolveBank(server, env);

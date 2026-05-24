@@ -1,10 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { createMcpServer } from '../server.ts';
+import type { Env } from '../lib/api.ts';
 
-const mockEnv = {
-    MCP_API_KEY: 'test-key',
+const mockEnv: Env = {
+    MCP_KEYS: '[]',
     OPENWALLET_API_KEY: 'api-key',
     OPENWALLET_API_URL: 'http://api.test',
+    ANALYTICS: { writeDataPoint: () => {} },
+    MCP_OBJECT: null,
+    LANGFUSE_PUBLIC_KEY: '',
+    LANGFUSE_SECRET_KEY: '',
+    LANGFUSE_BASE_URL: 'https://cloud.langfuse.com',
 };
 
 const EXPECTED_TOOLS = [

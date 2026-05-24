@@ -5,9 +5,12 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 OPENWALLET_API_URL = "https://api.openwallet.vn"
+LANGFUSE_PUBLIC_KEY = "pk-lf-513953f1-55b1-4f1d-9714-0a1fd7a816d6"
+LANGFUSE_BASE_URL = "https://cloud.langfuse.com"
 
 # Secrets — set via: wrangler secret put MCP_KEYS        (JSON array of key objects)
 #                    wrangler secret put OPENWALLET_API_KEY
+#                    wrangler secret put LANGFUSE_SECRET_KEY
 
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
