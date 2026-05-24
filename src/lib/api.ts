@@ -12,6 +12,7 @@ export interface Env {
     LANGFUSE_PUBLIC_KEY: string;
     LANGFUSE_SECRET_KEY: string;
     LANGFUSE_BASE_URL: string;
+    MCP_CLIENT_LABEL?: string;
 }
 
 export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {

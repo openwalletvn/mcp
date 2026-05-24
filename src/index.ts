@@ -6,7 +6,7 @@ import { validateKey } from './auth.js';
 
 export class OpenWalletMCP extends McpAgent<Env> {
     server = new McpServer(
-        { name: 'openwallet-mcp', version: '1.0.0' },
+        { name: 'openwallet-mcp', version: '1.0.2' },
         { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
     );
 
@@ -38,7 +38,7 @@ export default {
 
         // Health check — no auth required
         if (url.pathname === '/health') {
-            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.0' }), {
+            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.2' }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }
@@ -48,7 +48,7 @@ export default {
             return new Response(
                 JSON.stringify({
                     schemaVersion: 1,
-                    label: 'MCP v1.0.0',
+                    label: 'MCP v1.0.2',
                     message: 'online',
                     color: 'brightgreen',
                     cacheSeconds: 60,
@@ -76,6 +76,7 @@ export default {
                 });
             }
 
+            env.MCP_CLIENT_LABEL = result.label ?? 'unknown';
             console.log(JSON.stringify({ key: result.label!, path: url.pathname }));
             env.ANALYTICS?.writeDataPoint({
                 blobs: [result.label!, url.pathname],

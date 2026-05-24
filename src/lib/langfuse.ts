@@ -30,7 +30,7 @@ export async function sendTrace(env: Env, opts: {
                 input: opts.input,
                 output: opts.output,
                 metadata: opts.metadata,
-                tags: ['mcp'],
+                tags: ['mcp', env.MCP_CLIENT_LABEL ?? 'unknown'].filter(Boolean),
             },
         },
     ];
