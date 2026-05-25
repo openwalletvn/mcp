@@ -38,7 +38,16 @@ export default {
 
         // Health check — no auth required
         if (url.pathname === '/health') {
-            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.2' }), {
+            let api = false;
+            try {
+                const apiRes = await fetch(`${env.OPENWALLET_API_URL}/health`, {
+                    signal: AbortSignal.timeout(3000),
+                });
+                api = apiRes.ok;
+            } catch {
+                api = false;
+            }
+            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.2', api }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }

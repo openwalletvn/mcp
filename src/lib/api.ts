@@ -17,7 +17,7 @@ export interface Env {
 
 export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {
     const url = `${env.OPENWALLET_API_URL}${path}`;
-    return fetch(url, {
+    const res = await fetch(url, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -25,6 +25,11 @@ export async function apiFetch(env: Env, path: string, options?: RequestInit): P
             ...(options?.headers ?? {}),
         },
     });
+    if (!res.ok) {
+        const body = await res.text().catch(() => '');
+        throw new Error(`API ${res.status} ${res.statusText}${body ? ': ' + body.slice(0, 200) : ''}`);
+    }
+    return res;
 }
 
 const CARD_FIELDS = [
