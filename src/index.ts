@@ -3,10 +3,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createMcpServer } from './server.js';
 import type { Env } from './lib/api.js';
 import { validateKey } from './auth.js';
+import pkg from '../package.json';
 
 export class OpenWalletMCP extends McpAgent<Env> {
     server = new McpServer(
-        { name: 'openwallet-mcp', version: '1.0.2' },
+        { name: 'openwallet-mcp', version: pkg.version },
         { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
     );
 
@@ -47,7 +48,7 @@ export default {
             } catch {
                 api = false;
             }
-            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: '1.0.2', api }), {
+            return new Response(JSON.stringify({ name: 'openwallet-mcp', version: pkg.version, api }), {
                 headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
             });
         }
@@ -57,7 +58,7 @@ export default {
             return new Response(
                 JSON.stringify({
                     schemaVersion: 1,
-                    label: 'MCP v1.0.2',
+                    label: `MCP v${pkg.version}`,
                     message: 'online',
                     color: 'brightgreen',
                     cacheSeconds: 60,
