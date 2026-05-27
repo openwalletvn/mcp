@@ -36,7 +36,7 @@ export function registerCards(server: McpServer, env: Env) {
                 bank_id: z.string().optional().describe('Bank ID (e.g. vietcombank, techcombank, vpbank)'),
                 type: z.enum(['credit', 'debit', 'prepaid', 'transit', 'atm', '2in1', 'co-branded']).optional().describe('Card type filter'),
                 network: z.enum(['visa', 'mastercard', 'jcb', 'napas', 'amex', 'unionpay']).optional().describe('Payment network filter'),
-                intent: z.string().optional().describe('Spend intent slug — use listIntents to see valid values'),
+                intent: z.string().optional().describe('Spend intent slug — use intents to see valid values'),
                 limit: z.number().int().min(1).max(20).default(5).describe('Max results to return'),
             }),
             annotations: { readOnlyHint: true, destructiveHint: false },

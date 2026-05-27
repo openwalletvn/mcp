@@ -29,7 +29,7 @@ export function registerCompare(server: McpServer, env: Env) {
                 const data = await executeCompare(env, card_ids);
                 return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
             } catch (err) {
-                return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}. Use resolveCard to find valid IDs.` }] };
+                return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}. Use findCard to find valid IDs.` }] };
             }
         }
     );
