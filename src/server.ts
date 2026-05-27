@@ -3,11 +3,11 @@ import type {Env} from './lib/api.js';
 import {sendTrace} from './lib/langfuse.js';
 import pkg from '../package.json';
 import {registerBanks} from './tools/list-banks.js';
-import {registerFindBank} from './tools/resolve-bank.js';
+import {registerFindBank} from './tools/find-bank.js';
 import {registerIntents} from './tools/list-intents.js';
 import {registerCards} from './tools/search-cards.js';
 import {registerCard} from './tools/get-card-detail.js';
-import {registerFindCard} from './tools/resolve-card.js';
+import {registerFindCard} from './tools/find-card.js';
 import {registerRank} from './tools/rank-cards-for-spend.js';
 import {registerCompare} from './tools/compare-cards.js';
 
