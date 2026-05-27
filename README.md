@@ -30,35 +30,35 @@ Read more about [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspe
 
 ## Tools
 
-### `listBanks`
+### `banks`
 List all banks issuing cards in Vietnam.
 
-### `resolveBank(query)`
+### `findBank(query)`
 Find a bank by name or alias. Supports: "vcb", "a chau", "ngân hàng ngoại thương", etc.
 Returns first match or `null`.
 
-### `listIntents`
-List all valid intent slugs for use in `searchCards` and `rankCardsForSpend`.
+### `intents`
+List all valid intent slugs for use in `cards` and `rank`.
 
-### `searchCards(q?, bank_id?, type?, network?, intent?, limit?)`
+### `cards(q?, bank_id?, type?, network?, intent?, limit?)`
 Search cards by filter. Use for browsing cards by bank/type/network/intent.
-For "best card for spending X", use `rankCardsForSpend` instead.
+For "best card for spending X", use `rank` instead.
 
-### `getCardDetail(card_id)`
-Get full details for a single card by ID.
+### `card(card_id)`
+Get full details for a single card by ID. Use `findCard` first if you only have a name.
 
-### `resolveCard(query)`
+### `findCard(query)`
 Find a card ID from a name or description. E.g. "thẻ đen techcombank", "shopee vpbank".
-Returns `{ id, name, bank_id }` or `null`.
+Returns `{ id, name, bank_id, confidence: "exact" }` when unambiguous, or `{ confidence: "ambiguous", matches, message }` when multiple cards match.
 
-### `rankCardsForSpend(spend, limit?, type?)`
+### `rank(spend, limit?, type?)`
 **Primary tool** for card recommendations. Ranks all cards by actual spend profile.
 ```json
 { "spend": { "ecommerce": 5000000, "dining": 2000000 }, "limit": 3, "type": "credit" }
 ```
 Returns ranked list with estimated monthly cashback.
 
-### `compareCards(card_ids)`
+### `compare(card_ids)`
 Compare 2–4 cards side-by-side by ID.
 
 ## Badge
