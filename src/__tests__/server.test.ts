@@ -14,14 +14,14 @@ const mockEnv: Env = {
 };
 
 const EXPECTED_TOOLS = [
-    'listBanks',
-    'resolveBank',
-    'listIntents',
-    'searchCards',
-    'getCardDetail',
-    'resolveCard',
-    'rankCardsForSpend',
-    'compareCards',
+    'banks',
+    'findBank',
+    'intents',
+    'cards',
+    'card',
+    'findCard',
+    'rank',
+    'compare',
 ];
 
 describe('MCP server', () => {

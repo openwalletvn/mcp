@@ -8,7 +8,7 @@ export interface RankCardsInput {
     type?: string;
 }
 
-export async function executeRankCardsForSpend(env: Env, input: RankCardsInput) {
+export async function executeRank(env: Env, input: RankCardsInput) {
     const res = await apiFetch(env, '/api/v1/cards/rank', {
         method: 'POST',
         body: JSON.stringify(input),
@@ -18,12 +18,12 @@ export async function executeRankCardsForSpend(env: Env, input: RankCardsInput) 
     return json.data;
 }
 
-export function registerRankCardsForSpend(server: McpServer, env: Env) {
+export function registerRank(server: McpServer, env: Env) {
     server.registerTool(
-        'rankCardsForSpend',
+        'rank',
         {
             title: 'Rank Cards for Spend',
-            description: 'Rank all cards by estimated cashback for a given monthly spend profile. Returns up to limit cards sorted by total benefit, with per-intent and total cashback breakdown. spend must have at least one key with a value > 0. Use listIntents to discover valid spend category slugs.',
+            description: 'Rank all cards by estimated cashback for a given monthly spend profile. Returns up to limit cards sorted by total benefit, with per-intent and total cashback breakdown. spend must have at least one key with a value > 0. Use intents to discover valid spend category slugs.',
             inputSchema: z.object({
                 spend: z.record(z.string(), z.number()).describe(
                     'Monthly spend profile: keys are intent slugs, values are VND/month. Example: {"ecommerce":5000000,"dining":2000000}'
@@ -35,7 +35,7 @@ export function registerRankCardsForSpend(server: McpServer, env: Env) {
         },
         async (input) => {
             try {
-                const data = await executeRankCardsForSpend(env, input);
+                const data = await executeRank(env, input);
                 return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
             } catch (err) {
                 return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { apiFetch, stripCard, type Env } from '../lib/api.js';
 
-export async function executeCompareCards(env: Env, card_ids: string[]) {
+export async function executeCompare(env: Env, card_ids: string[]) {
     return Promise.all(
         card_ids.map(async (id) => {
             const res = await apiFetch(env, `/api/v1/cards/${id}`);
@@ -13,12 +13,12 @@ export async function executeCompareCards(env: Env, card_ids: string[]) {
     );
 }
 
-export function registerCompareCards(server: McpServer, env: Env) {
+export function registerCompare(server: McpServer, env: Env) {
     server.registerTool(
-        'compareCards',
+        'compare',
         {
             title: 'Compare Cards',
-            description: 'Fetch and compare 2–4 cards side-by-side by their IDs. Returns an array of stripped card objects in the same order as card_ids. Use resolveCard to get IDs from card names.',
+            description: 'Fetch and compare 2–4 cards side-by-side by their IDs. Returns an array of stripped card objects in the same order as card_ids. Use findCard to get IDs from card names.',
             inputSchema: z.object({
                 card_ids: z.array(z.string()).min(2).max(4).describe('List of card IDs to compare (2–4 cards)'),
             }),
@@ -26,7 +26,7 @@ export function registerCompareCards(server: McpServer, env: Env) {
         },
         async ({ card_ids }) => {
             try {
-                const data = await executeCompareCards(env, card_ids);
+                const data = await executeCompare(env, card_ids);
                 return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
             } catch (err) {
                 return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}. Use resolveCard to find valid IDs.` }] };

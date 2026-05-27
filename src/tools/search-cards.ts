@@ -11,7 +11,7 @@ export interface SearchCardsInput {
     limit: number;
 }
 
-export async function executeSearchCards(env: Env, input: SearchCardsInput) {
+export async function executeCards(env: Env, input: SearchCardsInput) {
     const { q, bank_id, type, network, intent, limit } = input;
     const params = new URLSearchParams();
     if (q) params.set('q', q);
@@ -25,12 +25,12 @@ export async function executeSearchCards(env: Env, input: SearchCardsInput) {
     return json.data.slice(0, limit).map(stripCard);
 }
 
-export function registerSearchCards(server: McpServer, env: Env) {
+export function registerCards(server: McpServer, env: Env) {
     server.registerTool(
-        'searchCards',
+        'cards',
         {
             title: 'Search Cards',
-            description: 'Browse cards by filter criteria — name query, bank, card type, payment network, or spend intent. Returns up to limit stripped card objects. For spend-based ranking, use rankCardsForSpend instead.',
+            description: 'Browse cards by filter criteria — name query, bank, card type, payment network, or spend intent. Returns up to limit stripped card objects. For spend-based ranking, use rank instead.',
             inputSchema: z.object({
                 q: z.string().optional().describe('Search by card name, ID, or bank name'),
                 bank_id: z.string().optional().describe('Bank ID (e.g. vietcombank, techcombank, vpbank)'),
@@ -43,7 +43,7 @@ export function registerSearchCards(server: McpServer, env: Env) {
         },
         async (input) => {
             try {
-                const data = await executeSearchCards(env, input);
+                const data = await executeCards(env, input);
                 return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
             } catch (err) {
                 return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };

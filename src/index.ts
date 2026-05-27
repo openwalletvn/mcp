@@ -8,7 +8,7 @@ import pkg from '../package.json';
 export class OpenWalletMCP extends McpAgent<Env> {
     server = new McpServer(
         { name: 'openwallet-mcp', version: pkg.version },
-        { instructions: 'Use resolveBank or resolveCard to get IDs before calling detail tools. Use listIntents to discover valid spend category slugs before calling rankCardsForSpend or filtering searchCards by intent.' }
+        { instructions: 'Use findBank or findCard to get IDs before calling detail tools. Use intents to discover valid spend category slugs before calling rank or filtering cards by intent.' }
     );
 
     async init() {

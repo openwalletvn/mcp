@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { executeCompareCards } from '../../tools/compare-cards.ts';
+import { executeCompare } from '../../tools/compare-cards.ts';
 
 const mockEnv = { MCP_API_KEY: 'k', OPENWALLET_API_KEY: 'k', OPENWALLET_API_URL: 'http://api.test' } as unknown as import('../../lib/api.ts').Env;
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('executeCompareCards', () => {
+describe('executeCompare', () => {
     it('fetches each card in parallel and strips heavy fields', async () => {
         const cards = [
             { id: 'techcombank-spark', name: 'Spark', bank_id: 'techcombank', image: 'strip-me', sources: [] },
@@ -17,7 +17,7 @@ describe('executeCompareCards', () => {
             return Promise.resolve(new Response(JSON.stringify({ success: true, data: card })));
         }));
 
-        const result = await executeCompareCards(mockEnv, ['techcombank-spark', 'vpbank-flex']);
+        const result = await executeCompare(mockEnv, ['techcombank-spark', 'vpbank-flex']);
         expect(result).toHaveLength(2);
         expect(result[0]).not.toHaveProperty('image');
         expect(result[0]).not.toHaveProperty('sources');
@@ -30,7 +30,7 @@ describe('executeCompareCards', () => {
             new Response(JSON.stringify({ success: false }))
         ));
         await expect(
-            executeCompareCards(mockEnv, ['bad-id', 'also-bad'])
+            executeCompare(mockEnv, ['bad-id', 'also-bad'])
         ).rejects.toThrow();
     });
 });

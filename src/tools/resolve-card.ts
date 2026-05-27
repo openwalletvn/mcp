@@ -5,7 +5,7 @@ import { apiFetch, type Env } from '../lib/api.js';
 type CardSlim = { id: string; name: string; bank_id: string };
 const MAX_CANDIDATES = 5;
 
-export async function executeResolveCard(env: Env, query: string) {
+export async function executeFindCard(env: Env, query: string) {
     const res = await apiFetch(env, `/api/v1/cards?q=${encodeURIComponent(query)}`);
     const json = await res.json() as { success: boolean; data: CardSlim[]; meta: { filtered: number } };
     if (!json.success) throw new Error('Failed to resolve card');
@@ -19,11 +19,11 @@ export async function executeResolveCard(env: Env, query: string) {
     };
 }
 
-export function registerResolveCard(server: McpServer, env: Env) {
+export function registerFindCard(server: McpServer, env: Env) {
     server.registerTool(
-        'resolveCard',
+        'findCard',
         {
-            title: 'Resolve Card',
+            title: 'Find Card',
             description: 'Look up a card ID from a name or description (e.g. "techcombank black", "shopee vpbank"). Returns { id, name, bank_id, confidence: "exact" } when unambiguous, or { confidence: "ambiguous", matches, message } when multiple cards match — in that case, present the matches to the user and ask them to clarify.',
             inputSchema: z.object({
                 query: z.string().describe('Card name or description to search for'),
@@ -32,7 +32,7 @@ export function registerResolveCard(server: McpServer, env: Env) {
         },
         async ({ query }) => {
             try {
-                const data = await executeResolveCard(env, query);
+                const data = await executeFindCard(env, query);
                 return { content: [{ type: 'text' as const, text: JSON.stringify(data) }] };
             } catch (err) {
                 return { isError: true, content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }] };

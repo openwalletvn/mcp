@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { executeListBanks } from '../../tools/list-banks.ts';
+import { executeBanks } from '../../tools/list-banks.ts';
 
 const mockEnv = { MCP_API_KEY: 'k', OPENWALLET_API_KEY: 'k', OPENWALLET_API_URL: 'http://api.test' } as unknown as import('../../lib/api.ts').Env;
 
@@ -10,12 +10,12 @@ const MOCK_BANKS = [
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('executeListBanks', () => {
+describe('executeBanks', () => {
     it('calls /api/v1/banks and returns id/name/full_name/link/networks only', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ success: true, data: MOCK_BANKS }))
         ));
-        const result = await executeListBanks(mockEnv);
+        const result = await executeBanks(mockEnv);
         expect(result).toHaveLength(2);
         expect(result[0]).toMatchObject({ id: 'vietcombank', name: 'Vietcombank' });
         expect((fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toContain('/api/v1/banks');
@@ -25,6 +25,6 @@ describe('executeListBanks', () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ success: false }))
         ));
-        await expect(executeListBanks(mockEnv)).rejects.toThrow();
+        await expect(executeBanks(mockEnv)).rejects.toThrow();
     });
 });

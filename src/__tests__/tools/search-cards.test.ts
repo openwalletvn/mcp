@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { executeSearchCards } from '../../tools/search-cards.ts';
+import { executeCards } from '../../tools/search-cards.ts';
 
 const mockEnv = { MCP_API_KEY: 'k', OPENWALLET_API_KEY: 'k', OPENWALLET_API_URL: 'http://api.test' } as unknown as import('../../lib/api.ts').Env;
 
@@ -13,12 +13,12 @@ const MOCK_CARD = {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('executeSearchCards', () => {
+describe('executeCards', () => {
     it('strips heavy fields from card data', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ success: true, data: [MOCK_CARD] }))
         ));
-        const result = await executeSearchCards(mockEnv, { limit: 5 });
+        const result = await executeCards(mockEnv, { limit: 5 });
         expect(result[0]).not.toHaveProperty('image');
         expect(result[0]).not.toHaveProperty('sources');
         expect(result[0]).toHaveProperty('id', 'techcombank-spark');
@@ -29,7 +29,7 @@ describe('executeSearchCards', () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ success: true, data: cards }))
         ));
-        const result = await executeSearchCards(mockEnv, { limit: 3 });
+        const result = await executeCards(mockEnv, { limit: 3 });
         expect(result).toHaveLength(3);
     });
 
@@ -37,7 +37,7 @@ describe('executeSearchCards', () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(
             new Response(JSON.stringify({ success: true, data: [] }))
         ));
-        await executeSearchCards(mockEnv, { bank_id: 'vpbank', intent: 'shopee', limit: 5 });
+        await executeCards(mockEnv, { bank_id: 'vpbank', intent: 'shopee', limit: 5 });
         const url = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
         expect(url).toContain('bank_id=vpbank');
         expect(url).toContain('intent=shopee');
