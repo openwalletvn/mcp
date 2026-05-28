@@ -10,6 +10,7 @@ import {registerCard} from './tools/get-card-detail.js';
 import {registerFindCard} from './tools/find-card.js';
 import {registerRank} from './tools/rank-cards-for-spend.js';
 import {registerCompare} from './tools/compare-cards.js';
+import {registerCashback} from './tools/cashback-card.js';
 
 export function createMcpServer(env: Env, server?: McpServer): McpServer {
     if (!server) {
@@ -57,6 +58,7 @@ export function createMcpServer(env: Env, server?: McpServer): McpServer {
     registerFindCard(server, env);
     registerRank(server, env);
     registerCompare(server, env);
+    registerCashback(server, env);
 
     return server;
 }
