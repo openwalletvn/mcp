@@ -36,7 +36,7 @@ const CARD_FIELDS = [
     'id', 'name', 'bank_id', 'card_network', 'card_tier', 'card_type', 'co_brand',
     'status', 'currency', 'statement_date', 'interest_free_days', 'card_link',
     'is_metal', 'for_business', 'intents', 'contactless_methods',
-    'fees', 'cashback', 'description', 'score', '_source',
+    'fees', 'cashback', 'description', 'score', 'data_score', '_source',
 ];
 
 const BANK_FIELDS = [
