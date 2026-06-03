@@ -9,10 +9,22 @@ export interface CashbackCardInput {
     spend_profile?: Record<string, number>;
 }
 
-export async function executeCashback(env: Env, { card_id, ...body }: CashbackCardInput) {
-    const res = await apiFetch(env, `/api/v1/cards/${encodeURIComponent(card_id)}/cashback`, {
+export async function executeCashback(env: Env, { card_id, intents, monthly_spend, spend_profile }: CashbackCardInput) {
+    // Convert spend_profile {slug: amount} → intent strings "slug:amount"
+    let intentStrs: string[] | undefined;
+    if (spend_profile && Object.keys(spend_profile).length > 0) {
+        intentStrs = Object.entries(spend_profile).map(([slug, amt]) => `${slug}:${amt}`);
+    } else if (intents?.length) {
+        intentStrs = intents;
+    }
+
+    const res = await apiFetch(env, '/api/v1/cashback', {
         method: 'POST',
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+            cards: [card_id],
+            intents: intentStrs,
+            total_spend: monthly_spend,
+        }),
     });
     const json = await res.json() as { success: boolean; data: unknown; error?: string };
     if (!json.success) throw new Error(json.error ?? 'Failed to compute cashback');
