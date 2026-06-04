@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "echo '' && echo '  MCP Inspector → http://localhost:8002' && echo '' && (kill $(lsof -ti:6277) 2>/dev/null; kill $(lsof -ti:8002) 2>/dev/null; CLIENT_PORT=8002 npx @modelcontextprotocol/inspector --transport http --server-url http://localhost:8001 &) && wrangler dev",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "test": "vitest run",

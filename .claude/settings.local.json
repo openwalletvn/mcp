@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/bmp/.wrangler/config/**)",
+      "Bash(wrangler whoami *)",
+      "Bash(wrangler analytics-engine *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(curl -s https://mcp.openwallet.vn/health)",
+      "Bash(curl -s https://openwallet-mcp.bmp.workers.dev/health)",
+      "Bash(npx wrangler *)"
+    ]
+  }
+}

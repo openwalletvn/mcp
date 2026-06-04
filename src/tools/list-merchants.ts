@@ -3,7 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { apiFetch, type Env } from '../lib/api.js';
 
 export async function executeMerchants(env: Env) {
-    const res = await apiFetch(env, '/api/v1/merchants');
+    const res = await apiFetch(env, '/api/v1/meta/merchants');
     const json = await res.json() as { success: boolean; data: unknown };
     if (!json.success) throw new Error('Failed to fetch merchants');
     return json.data;

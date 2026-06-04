@@ -14,7 +14,6 @@ import {registerCashback} from './tools/cashback-card.js';
 import {registerRelatedCards} from './tools/related-cards.js';
 import {registerPersonas} from './tools/list-personas.js';
 import {registerMerchants} from './tools/list-merchants.js';
-import {registerCashbackCategories} from './tools/list-cashback-categories.js';
 import {registerIntentGroups} from './tools/list-intent-groups.js';
 
 export function createMcpServer(env: Env, server?: McpServer): McpServer {
@@ -67,7 +66,6 @@ export function createMcpServer(env: Env, server?: McpServer): McpServer {
     registerRelatedCards(server, env);
     registerPersonas(server, env);
     registerMerchants(server, env);
-    registerCashbackCategories(server, env);
     registerIntentGroups(server, env);
 
     return server;
