@@ -1,20 +1,8 @@
-import { McpAgent } from 'agents/mcp';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { createMcpServer } from './server.js';
 import type { Env } from './lib/api.js';
 import { validateKey } from './auth.js';
-import pkg from '../package.json';
-
-export class OpenWalletMCP extends McpAgent<Env> {
-    server = new McpServer(
-        { name: 'openwallet-mcp', version: pkg.version },
-        { instructions: 'Use findBank or findCard to get IDs before calling detail tools. Use intents to discover valid spend category slugs before calling rank or filtering cards by intent.' }
-    );
-
-    async init() {
-        createMcpServer(this.env, this.server);
-    }
-}
 
 const ALLOWED_PATHS = new Set(['/', '/health', '/sse', '/message', '/badge']);
 
@@ -24,15 +12,16 @@ const CORS_HEADERS = {
     'Access-Control-Allow-Headers': '*',
 };
 
+import pkg from '../package.json';
+
 export default {
-    async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
         // CORS preflight
         if (request.method === 'OPTIONS') {
             return new Response(null, { status: 204, headers: CORS_HEADERS });
         }
 
         const url = new URL(request.url);
-        // Allowlist check – block unknown paths before auth
         if (!ALLOWED_PATHS.has(url.pathname)) {
             return new Response(null, { status: 404 });
         }
@@ -53,7 +42,7 @@ export default {
             });
         }
 
-        // Badge — no auth, for shields.io endpoint badge
+        // Badge — no auth
         if (url.pathname === '/badge') {
             return new Response(
                 JSON.stringify({
@@ -94,8 +83,23 @@ export default {
             });
         }
 
-        // MCP via McpAgent (handles sessions + SSE)
-        const response = await OpenWalletMCP.serve('/').fetch(request, env, ctx);
+        const sessionId = request.headers.get('x-session-id');
+        if (sessionId) env.SESSION_ID = sessionId;
+
+        // Stateless MCP — new transport + server per request, no DO
+        const server = new McpServer(
+            { name: 'openwallet-mcp', version: pkg.version },
+            { instructions: 'Use findBank or findCard to get IDs before calling detail tools. Use intents to discover valid spend category slugs before calling rank or filtering cards by intent.' }
+        );
+        createMcpServer(env, server);
+
+        const transport = new WebStandardStreamableHTTPServerTransport({
+            sessionIdGenerator: undefined, // stateless — no session tracking
+        });
+
+        await server.connect(transport);
+        const response = await transport.handleRequest(request);
+
         const headers = new Headers(response.headers);
         for (const [k, v] of Object.entries(CORS_HEADERS)) headers.set(k, v);
         return new Response(response.body, { status: response.status, statusText: response.statusText, headers });

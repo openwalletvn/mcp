@@ -19,12 +19,6 @@ LANGFUSE_BASE_URL = "https://cloud.langfuse.com"
 binding = "ANALYTICS"
 dataset = "mcp_usage"
 
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["OpenWalletMCP"]
-
-[durable_objects]
-bindings = [{ class_name = "OpenWalletMCP", name = "MCP_OBJECT" }]
 
 [observability]
 enabled = true

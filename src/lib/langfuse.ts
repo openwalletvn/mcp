@@ -15,6 +15,7 @@ export async function sendTrace(env: Env, opts: {
     metadata?: Record<string, unknown>;
     level?: 'DEFAULT' | 'ERROR';
     statusMessage?: string;
+    sessionId?: string;
 }): Promise<void> {
     const traceId = uuid();
     const now = new Date().toISOString();
@@ -30,6 +31,7 @@ export async function sendTrace(env: Env, opts: {
                 input: opts.input,
                 output: opts.output,
                 metadata: opts.metadata,
+                ...(opts.sessionId ? { sessionId: opts.sessionId } : {}),
                 tags: ['mcp', env.MCP_CLIENT_LABEL ?? 'unknown'].filter(Boolean),
             },
         },

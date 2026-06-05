@@ -7,24 +7,43 @@ export interface Env {
     OPENWALLET_API_KEY: string;
     OPENWALLET_API_URL: string;
     ANALYTICS: AnalyticsEngineDataset;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    MCP_OBJECT: any;
     LANGFUSE_PUBLIC_KEY: string;
     LANGFUSE_SECRET_KEY: string;
     LANGFUSE_BASE_URL: string;
     MCP_CLIENT_LABEL?: string;
+    SESSION_ID?: string;
 }
 
-export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {
-    const url = `${env.OPENWALLET_API_URL}${path}`;
-    const res = await fetch(url, {
+const LIVE_API_URL = 'https://api.openwallet.vn';
+
+async function fetchFrom(baseUrl: string, path: string, apiKey: string, options?: RequestInit): Promise<Response> {
+    return fetch(`${baseUrl}${path}`, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
-            'X-OpenWallet-Key': env.OPENWALLET_API_KEY,
+            'X-OpenWallet-Key': apiKey,
             ...(options?.headers ?? {}),
         },
     });
+}
+
+export async function apiFetch(env: Env, path: string, options?: RequestInit): Promise<Response> {
+    const primaryUrl = env.OPENWALLET_API_URL;
+    const useFallback = primaryUrl !== LIVE_API_URL;
+
+    let res: Response;
+    try {
+        res = await fetchFrom(primaryUrl, path, env.OPENWALLET_API_KEY, options);
+    } catch (err) {
+        if (!useFallback) throw err;
+        res = await fetchFrom(LIVE_API_URL, path, env.OPENWALLET_API_KEY, options);
+    }
+
+    // On server error, retry against live API once
+    if (!res.ok && useFallback && res.status >= 500) {
+        res = await fetchFrom(LIVE_API_URL, path, env.OPENWALLET_API_KEY, options);
+    }
+
     if (!res.ok) {
         const body = await res.text().catch(() => '');
         throw new Error(`API ${res.status} ${res.statusText}${body ? ': ' + body.slice(0, 200) : ''}`);

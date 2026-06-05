@@ -39,6 +39,7 @@ export function createMcpServer(env: Env, server?: McpServer): McpServer {
                     input,
                     output: result,
                     metadata: { latencyMs: Date.now() - start },
+                    sessionId: env.SESSION_ID,
                 });
                 return result;
             } catch (err) {
@@ -48,6 +49,7 @@ export function createMcpServer(env: Env, server?: McpServer): McpServer {
                     level: 'ERROR',
                     statusMessage: String(err),
                     metadata: { latencyMs: Date.now() - start },
+                    sessionId: env.SESSION_ID,
                 });
                 throw err;
             }

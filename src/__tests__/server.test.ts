@@ -7,7 +7,6 @@ const mockEnv: Env = {
     OPENWALLET_API_KEY: 'api-key',
     OPENWALLET_API_URL: 'http://api.test',
     ANALYTICS: { writeDataPoint: () => {} },
-    MCP_OBJECT: null,
     LANGFUSE_PUBLIC_KEY: '',
     LANGFUSE_SECRET_KEY: '',
     LANGFUSE_BASE_URL: 'https://cloud.langfuse.com',
