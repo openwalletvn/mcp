@@ -83,6 +83,12 @@ export default {
             });
         }
 
+        // Reject GET on MCP path — stateless server has no SSE stream to offer;
+        // returning 405 stops the @ai-sdk/mcp client's inbound SSE retry loop.
+        if (request.method === 'GET' && url.pathname === '/') {
+            return new Response(null, { status: 405, headers: CORS_HEADERS });
+        }
+
         const sessionId = request.headers.get('x-session-id');
         if (sessionId) env.SESSION_ID = sessionId;
 
