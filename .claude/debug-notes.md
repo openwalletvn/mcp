@@ -49,3 +49,18 @@ deleted_classes = ["OpenWalletMCP"]
 ```
 
 **Rule:** Any time a Durable Object class is renamed or removed, add a `[[migrations]]` entry before deploying.
+
+---
+
+## 2026-06-06 — Free-tier quota exhaustion from DO SQLite writes
+
+**Symptom:** Cloudflare free-tier DO SQLite row write quota exceeded. Caused by SSE reconnect loop — local dev MCP client pointed at prod URL (`mcp.openwallet.vn`), triggering repeated DO instantiation and SQLite writes on every reconnect.
+
+**Root cause:** `McpAgent` (from `agents` package) uses Durable Objects with SQLite storage to maintain session state. MCP clients poll/reconnect aggressively → each reconnect = new DO instance = SQLite writes → quota blown fast.
+
+**Fix (commit `a134e57`):** Replace `McpAgent` DO with stateless Cloudflare Worker using `WebStandardStreamableHTTPServerTransport` with `sessionIdGenerator: undefined`. No session state needed — all tools are pure API proxies.
+- Removed `agents` dep entirely
+- Removed `[[durable_objects]]` and `[[migrations]]` from `wrangler.toml`
+- New transport created per request, discarded after
+
+**Rule:** Never point local MCP client at prod URL during dev — use `wrangler dev` local instance (`http://localhost:8001`). Stateless transport eliminates the quota issue entirely but the principle holds.
