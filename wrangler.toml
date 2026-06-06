@@ -1,6 +1,10 @@
 name = "openwallet-mcp"
 main = "src/index.ts"
 compatibility_date = "2025-05-01"
+
+[[migrations]]
+tag = "v1-delete-do"
+deleted_classes = ["OpenWalletMCP"]
 compatibility_flags = ["nodejs_compat"]
 
 [dev]
